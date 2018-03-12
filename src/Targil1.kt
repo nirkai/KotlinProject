@@ -33,6 +33,7 @@ fun sub(): String {
             "M=M-D\n" +
             "@SP\n" +
             "M=M-1\n"
+    
 }
 
 fun push(arg1: String, arg2:String):String{
