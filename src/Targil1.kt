@@ -1,3 +1,4 @@
+import java.awt.font.NumericShaper
 import java.io.File
 import java.io.FileWriter
 
@@ -5,20 +6,45 @@ var lableNum = 0
 
 fun main(args: Array<String>) {
     // var p = "C:\\Users\\ניר\\Documents\\מדעי המחשב\\שנה ג - תשעח\\סימסטר ב\\עקרונות שפות תכנה\\Exercises\\Targil2\\project 08\\FunctionCalls\\StaticsTest"
+    var filePath = System.getProperty("user.dir")
+    //val filePath = p
 
-    val sys = File("Sys.vm")
+    if (args.size > 0){
+        println(args.get(0))
+
+        filePath = args.get(0)
+        if (filePath.isNullOrEmpty()) {
+            println("problem, file is: " + filePath)
+            filePath = System.getProperty("user.dir")
+        }
+    }
+    val title =    """
+
+//  ***********************************************
+//  *            --- Created By ---               *
+//  *     David Grofman                           *
+//  * &&                                          *
+//  *     Nir Kaizler                             *
+//  *                                             *
+//  ***********************************************
+
+                """.trimIndent()
+
+    val sys = File(filePath + "\\Sys.vm")
     if (sys.isFile){
         var outputFileName = "output"
-        File(System.getProperty("user.dir")).walk().forEach { tstFile ->
+        File(filePath).walk().forEach { tstFile ->
             if (tstFile.isFile && tstFile.name.contains(".tst") && !tstFile.name.contains("VME.tst")){
                 outputFileName = tstFile.name
             }
         }
         outputFileName = outputFileName.removeSuffix(".tst")
-        val outStream = FileWriter(outputFileName + ".asm")
+        val outStream = FileWriter(filePath + "\\" +outputFileName + ".asm")
 
         outStream
-        outStream.write("@256\n" +
+        outStream.write("// \t\t\t---- $outputFileName ASM file ----\n\n$title" +
+                "\n// restart the stack\n" +
+                "@256\n" +
                 "D=A\n" +
                 "@0\n" +
                 "M=D\n" +
@@ -26,9 +52,9 @@ fun main(args: Array<String>) {
         println("Print sys.vm file!!!")
         var output = ""
         //outStream.append(output)
-        val path = System.getProperty("user.dir")
-        println("\nWorking Directory = $path \n")
-        File(System.getProperty("user.dir")).walk().forEach { fileVm ->
+        //val path = System.getProperty("user.dir")
+        println("\nWorking Directory = $filePath \n")
+        File(filePath).walk().forEach { fileVm ->
             if (fileVm.isFile && fileVm.name.contains(".vm")){
                 output = vmToAsm(fileVm)
                 outStream.append(output)
@@ -37,11 +63,13 @@ fun main(args: Array<String>) {
         outStream.close()
     }
     else{
-        File(System.getProperty("user.dir")).walk().forEach { fileVm ->
+        File(filePath).walk().forEach { fileVm ->
             var asmfile = fileVm.name.removeSuffix(".vm")
             if (fileVm.isFile && fileVm.name.contains(".vm")){
-                var outStream = FileWriter(asmfile + ".asm")
-                outStream.write("@256\n" +
+                var outStream = FileWriter(filePath + "\\" + asmfile + ".asm")
+                outStream.write("// \t\t\t---- $asmfile ASM file ----\n\n$title" +
+                        "\n// restart the stack\n" +
+                        "@256\n" +
                         "D=A\n" +
                         "@0\n" +
                         "M=D\n")

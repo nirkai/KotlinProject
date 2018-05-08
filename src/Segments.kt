@@ -2,7 +2,8 @@ class Segments {
     companion object {
 
         fun constant(number: String) : String{
-            var outPut = "\n@" + number +
+            var outPut = "\n// push constant\n" +
+                    "@$number" +
                     "\n" +
                     "D=A\n" +
                     "@SP\n"+
@@ -14,13 +15,13 @@ class Segments {
         }
 
         private fun pushTempPointerStatic(segment:String, number: String,fileNameLable: String): String {
-            var num = ""
+            var num = "\n// push $segment $fileNameLable $number\n"
             when(segment){
-                "temp"      -> num ="@" + (5 + number.toInt()).toString() + "\n"
+                "temp"      -> num ="@${5 + number.toInt()}\n"
                 "pointer"   ->  if (number.equals("0"))
-                    num += "@THIS\n"
-                else
-                    num += "@THAT\n"
+                                    num += "@THIS\n"
+                                else
+                                    num += "@THAT\n"
                 "static" -> {var i = 0
                     while(i <= number.toInt())
                         num += "@" + fileNameLable + "." + (i++) +"\n"
@@ -34,17 +35,18 @@ class Segments {
                     "@SP\n" +
                     "M=M+1\n"
         }
+
         fun push(segment:String, number:String,fileNameLable:String):String{
-            var output = "@" + number + "\n" + "D=A\n"
+            var output = "\n// push $segment $fileNameLable $number\n" +
+                    "@$number\n" + "D=A\n"
             when(segment){
-                "local"             -> output += "@LCL\n"
+                "local"  -> output += "@LCL\n"
                 "argument"          -> output += "@ARG\n"
                 "this"              -> output += "@THIS\n"
                 "that"              -> output += "@THAT\n"
                 "constant"          -> return constant(number)
-                "temp","pointer","static"    -> return pushTempPointerStatic(segment, number,fileNameLable)
-            //"static" -> return pushStatic(number,fileNameLable)
-
+                "temp","pointer",
+                    "static"        -> return pushTempPointerStatic(segment, number,fileNameLable)
             }
             output += "A=M+D\n" +
                     "D=M\n" +
@@ -56,28 +58,15 @@ class Segments {
             return output
         }
 
-        /*private fun pushStatic(num: String, fileNameLable: String): String {
-            return """
-@""" + fileNameLable  + "." + num + """
-D=M
-@SP
-A=M
-M=D
-@SP
-M=M+1
-"""
-        }*/
-
         fun pop(segment:String, number:String,fileNameLable:String):String{
-            var output = "@SP\nA=M-1\nD=M\n"
+            var output = "\n// pop $segment $fileNameLable $number\n" +
+                    "@SP\nA=M-1\nD=M\n"
             when(segment){
                 "local" -> output += "@LCL\n"
                 "argument" -> output += "@ARG\n"
                 "this" -> output += "@THIS\n"
                 "that" -> output += "@THAT\n"
                 "temp", "pointer","static" -> return popTempPointerStatic(segment, number,fileNameLable)
-            //"static" -> return popStatic(number,fileNameLable)
-
             }
             output += "A=M\n"
             var i = 0
@@ -89,41 +78,30 @@ M=M+1
             return output
         }
 
-        /*private fun popStatic(num: String, fileNameLable: String): String {
-            return """
-@SP
-A=M-1
-D=M
-@""" + fileNameLable + "." + num +"""
-M=D
-@SP
-M=M-1
-"""
-        }
-*/
         private fun popTempPointerStatic(segment:String, number: String, fileNameLable: String): String {
             var num = ""
             when(segment){
-                "temp"      -> num = "@"+(5 + number.toInt()).toString()
+                "temp"      -> num += "@${5+number.toInt()}"
                 "pointer"   ->  if (number.equals("0"))
                     num += "@THIS\n"
                 else
                     num += "@THAT\n"
                 "static" -> {var i = 0
                     while(i <= number.toInt())
-                        num += "@" + fileNameLable + "." + (i++) +"\n"
+                        num += "@$fileNameLable.${i++}\n"
                 }
             }
 
             return """
-@SP
-A=M-1
-D=M
-"""+ num +"""
-M=D
-@SP
-M=M-1
-"""
+                |// pop $segment $fileNameLable $number
+                |@SP
+                |A=M-1
+                |D=M
+                |$num
+                |M=D
+                |@SP
+                |M=M-1
+                |""".trimMargin()
         }
 
     }
