@@ -10,3 +10,8 @@ eq
 push constant 8
 push constant 8
 eq
+eq
+push constant 8
+push constant 7
+eq
+eq

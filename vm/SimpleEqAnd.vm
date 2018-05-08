@@ -12,3 +12,24 @@ push constant 5
 push constant 5
 eq
 and
+push constant 7
+push constant 6
+eq
+push constant 5
+push constant 5
+eq
+and
+push constant 7
+push constant 7
+eq
+push constant 5
+push constant 6
+eq
+and
+push constant 7
+push constant 6
+eq
+push constant 5
+push constant 6
+eq
+and

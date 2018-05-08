@@ -2,16 +2,15 @@
 D=A
 @0
 M=D
+
 @5
 D=A
-@0
+@SP
 A=M
 M=D
+@SP
+M=M+1
 
-D=A
-D=D+1
-@0
-M=D
 @SP
 A=M-1
 D=M
