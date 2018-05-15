@@ -5,7 +5,7 @@ class TokensWords {
         val keywordsList = arrayOf("class", "constructor", "function", "method", "field", "static",
                 "var", "int", "char", "boolean", "void", "true", "false", "null", "this", "let", "do", "if", "else", "while", "return")
 
-        val symbolList = arrayOf("{", "}", "(", ")", "[", "]", ".", ",", ";", "+", "-", "*", "/", "&", "|", "<", ">", "=", "~")
+        val symbolList = arrayOf('{', '}', '(', ')', '[', ']', '.', ',', ';', '+', '-', '*', '/', '&', '|', '<', '>', '=', '~')
 
     }
 }

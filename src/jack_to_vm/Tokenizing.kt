@@ -2,6 +2,7 @@ package jack_to_vm
 
 import java.io.File
 import java.io.FileWriter
+import java.io.IOException
 
 class Tokenizing {
     companion object {
@@ -29,9 +30,10 @@ class Tokenizing {
             var word: String = "";
             val str = fileJack.readText()
             var content = str
-            content = content.replace("//.*?\r\n".toRegex(), "\n")
-            content = content.replace("/\\*.*?\\*/".toRegex(), "\n")
-            content = content.replace("\t","")
+            content = content.replace("//.*?\r\n".toRegex(), "\r\n")
+            content = content.replace("/\\*.*?\\*/".toRegex(), "\r\n")
+            content = content.replace("\r\n"," ")
+            content = content.replace("  *".toRegex(), " ")
             println(content)
 
             fun number(index : Int) : Int{
@@ -64,7 +66,7 @@ class Tokenizing {
                     return index
             }*/
             fun keyWords(index: Int, c: String, w1:String, w2:String):String{
-                if (w1.equals(w2))
+                if (w1.equals(w2) && (c[index].equals(' ') || isSymbolExist(c[index])))
                     return w2
                 else if(w1.length < w2.length && w2.startsWith(w1)) {
                     var w = w1
@@ -107,76 +109,49 @@ class Tokenizing {
             }
 
             var i = 0
-            while (i < content.length){
+            try {
+                while (i < content.length) {
+                    if (content[i].equals(' ')) {
+                    } else if (content.get(i).isDigit()) {
+                        word += content[i].toString()
+                        i = number(i)
+                        output += "\t<integerConstant>$word</intergerConstant>\n"
+                        word = ""
+                    } else if (TokensWords.symbolList.contains(content[i])) {
+                        output += "\t<symbol>${content[i].toString()}</symbol>\n"
+                    } else if (content[i].equals('\"')) {
+                        i = stringConstant(i)
+                        output += "\t<StringConstant>$word</StringConstant>\n"
+                        word = ""
+                    } else {
+                        TokensWords.keywordsList.forEach { keyword ->
 
-                //while (i < content.length && (content[i].equals(' ') || content[i].equals('\r') || content[i].equals('\n'))) i++
-                /*if (content[i].equals('/')){
-                    println(content[i] + "" +content[i+1])
-                    if (content[i+1].equals('/'))
-                        i = comment1(i)
-                    //while (content[i].equals(' ')) i++
-                    if ((i + 1 < content.length) && content[i+1].equals('*'))
-                        i = comment2(i)*/
-                if (content[i].equals('/')&&content[i+1].equals('/'))
-                        i = comment1(i)
+                            if (word.equals("") && keyword.startsWith(content[i])) {
+                                word = keyWords(i, content, "", keyword)
+                            }
+                        }
+                        if (!word.equals("")) {
+                            i += word.length - 1
+                            output += "\t<keyword>$word</keyword>\n"
+                            word = ""
+                        } else if (content[i].isLetter() || content[i].equals('_')) {
+                            while (i < content.length && !content[i].equals(' ') && !isSymbolExist(content[i])) {
+                                word += content[i]
+                                i++
+                            }
+                            output += "\t<identifier>$word</identifier>\n"
+                            word = ""
+                            i--
+                        }
 
-                if (content[i].equals('/')&&content[i+1].equals('*'))
-                    i = comment2(i)
-                if (i < content.length && content[i].equals('\r')){
-                    println(content[i])
+                    }
                     i++
                 }
-                if (content[i].equals('\n')){
-                    println(content[i])
-                }
-                if (content[i].equals('\t')){}
-                else if (content.get(i).isDigit()) {
-                    word += content[i].toString()
-                    i = number(i)
-                    output += "\t<integerConstant>$word</intergerConstant>\n"
-                    word = ""
-                } else if (TokensWords.symbolList.contains(content[i].toString()) && !content[i+1].equals('/')) {
-                    output += "\t<symbol>${content[i].toString()}</symbol>\n"
-                }
-                else if (content[i].equals("\"")){
-                    i = stringConstant(i)
-                    output += "\t<StringConstant>$word</StringConstant>\n"
-                    word = ""
-                }
-                else {
-                    while (i < content.length && (content[i].equals(' ') || content[i].equals('\r') || content[i].equals('\n')))
-                        i++
-                    if (i < content.length && !((content[i].equals('/') && content[i+1].equals('/'))
-                                || (content[i].equals('/') && content[i+1].equals('*')))){
-                    TokensWords.keywordsList.forEach { keyword ->
-
-                        if (word.equals("") && keyword.startsWith(content[i])){
-                            word = keyWords(i, content, "", keyword)
-                        }
-                    }
-                    if (!word.equals("")){
-                        i += word.length
-                        output += "\t<keyword>$word</keyword>\n"
-                        word = ""
-                    }
-                    else if (content[i].isLetter() || content[i].equals('_')){
-                        while (i < content.length && !content[i].equals(' ') && !isSymbolExist(content[i])){
-                            word += content[i]
-                            i++
-                        }
-                        output += "\t<identifier>$word</identifier>\n"
-                        word = ""
-                        i--
-                    }
-                }
-                }
-                /*if (i < content.length && (content[i].equals(' ') || content[i].equals('\r') || content[i].equals('\n'))) {
-                    while (i < content.length && (content[i].equals(' ') || content[i].equals('\r') || content[i].equals('\n')))
-                        i++
-                    i--
-                }*/
-                i++
             }
+            catch (e : IOException){
+                println(content.substring(i))
+            }
+
 
             return output
             }
