@@ -2,6 +2,8 @@ package jack_to_vm
 
 import java.io.File
 import java.io.FileWriter
+import java.util.regex.Matcher
+import java.util.regex.Pattern
 
 class Tokenizing2 {
     companion object {
@@ -13,7 +15,7 @@ class Tokenizing2 {
                     var outStream = FileWriter(filePath + "\\" + fileJack.name.removeSuffix(".jack") + "T.xml")
                     outStream.write("<tokens>\n")
                     var output = jackToTok(fileJack)
-                    outStream.append(output + "</tokens>")
+                    outStream.append(output + "</tokens>\n")
                     outStream.close()
                 }
             }
@@ -23,6 +25,8 @@ class Tokenizing2 {
             var output = ""
             var word: String = "";
             val str = fileJack.readText()
+            println(str  + "\n\n")
+
             var content = str
             content = content.replace("//.*?\r\n".toRegex(), "\r\n")
             content = content.replace("/\\*.*?\\*/".toRegex(), "\r\n")
@@ -30,12 +34,19 @@ class Tokenizing2 {
             content = content.replace("  *".toRegex(), " ")
             println(content)
 
-            fun number() {
-                while (content.isNotEmpty() && content[0].isDigit()) {
-                    word += content[0].toString()
-                    content = content.trimStart(content[0])
-                }
+            var d = "3123; jljl"
+            var p = Pattern.compile("[0123456789]*")
+            var m = p.matcher(d)
+            if (m.find())
+                println(m.group(0))
 
+            fun number() : String {
+                var w = ""
+                while (content.isNotEmpty() && content[0].isDigit()) {
+                    w += content[0].toString()
+                    content = content.substring(1)
+                }
+                return w
             }
 
             fun stringConstant() : String {
@@ -57,36 +68,47 @@ class Tokenizing2 {
             }
 
             while (content.isNotEmpty()){
-
                 when {
-                    (content[0].equals(' ')) ->
+                    content[0].equals(' ') ->
                         content = content.trimStart(content[0])
 
-                    (content[0].isDigit()) -> {
-                        word += content[0].toString()
+                    content[0].isDigit() -> {
                             val n = number()
-                        output += "\t<integerConstant>$n</intergerConstant>\n"
+                        output += "<integerConstant> $n </intergerConstant>\n"
                     }
-                    (TokensWords.symbolList.contains(content[0])) -> {
-                        output += "\t<symbol>${content[0].toString()}</symbol>\n"
+                    TokensWords.symbolList.contains(content[0]) -> {
+                        output += "<symbol> ${symbol(content[0])} </symbol>\n"
                         content = content.substring(1)
                     }
-                    (content[0].equals('\"')) -> {
+                    content[0].equals('\"') -> {
                         val w = stringConstant()
-                        output += "\t<StringConstant>$w</StringConstant>\n"
+                        output += "<StringConstant> $w </StringConstant>"
                         content = content.substring(w.length + 1)
                         word = ""
                     }
                     else -> {
                         var w = ""
-                        TokensWords.keywordsList.forEach { keyword ->
+                        while (content.isNotEmpty() && !content[0].equals(' ') && isSymbolExist(content[0])){
+                            w += content[0]
+                            content = content.substring(1)
+
+                        }
+                        if (TokensWords.keywordsList.contains(w)){
+                            output += "<keyword> $w </keyword>\n"
+                        }
+                        else{
+                            output += "<identifier> $w </identifier>\n"
+                        }
+                        content = content.substring(w.length)
+
+                        /*TokensWords.keywordsList.forEach { keyword ->
 
                             if (w.equals("") && keyword.startsWith(content[0])) {
                                 w = keyWords(0, content, "", keyword)
                             }
                         }
                         if (!w.equals("")) {
-                            output += "\t<keyword>$w</keyword>\n"
+                            output += "<keyword> $w </keyword>\n"
                             for (w1 in w)
                                 content = content.trimStart(w1)
                             word = ""
@@ -96,12 +118,12 @@ class Tokenizing2 {
                                 w += content[0]
                                 content = content.substring(1)
                             }
-                            output += "\t<identifier>$w</identifier>\n"
+                            output += "<identifier> $w </identifier>\n"
                             for (w1 in w)
                                 content = content.trimStart(w1)
                             word = ""
 
-                        }
+                        }*/
 
                     }
                 }
@@ -117,6 +139,17 @@ class Tokenizing2 {
             }
             return false
         }
+
+        fun symbol(s : Char) : String{
+            return when (s){
+                    '>' -> "&gt"
+                    '<' -> "&lt"
+                    '&' -> "amp"
+                    '"' -> "&quet"
+                    else -> s.toString()
+                }
+        }
+
     }
 
 

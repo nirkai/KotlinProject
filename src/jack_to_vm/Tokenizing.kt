@@ -19,7 +19,7 @@ class Tokenizing {
                     var outStream = FileWriter(filePath + "\\" + fileJack.name.removeSuffix(".jack") + "T.xml")
                     outStream.write("<tokens>\n")
                     var output = jackToTok(fileJack)
-                    outStream.append(output + "</tokens>")
+                    outStream.append(output + "</tokens>\n")
                     outStream.close()
                 }
             }
@@ -115,13 +115,13 @@ class Tokenizing {
                     } else if (content.get(i).isDigit()) {
                         word += content[i].toString()
                         i = number(i)
-                        output += "\t<integerConstant>$word</intergerConstant>\n"
+                        output += "<integerConstant> $word </intergerConstant>\n"
                         word = ""
                     } else if (TokensWords.symbolList.contains(content[i])) {
-                        output += "\t<symbol>${content[i].toString()}</symbol>\n"
+                        output += "<symbol> ${content[i].toString()} </symbol>\n"
                     } else if (content[i].equals('\"')) {
                         i = stringConstant(i)
-                        output += "\t<StringConstant>$word</StringConstant>\n"
+                        output += "<StringConstant> $word </StringConstant>\n"
                         word = ""
                     } else {
                         TokensWords.keywordsList.forEach { keyword ->
@@ -132,14 +132,14 @@ class Tokenizing {
                         }
                         if (!word.equals("")) {
                             i += word.length - 1
-                            output += "\t<keyword>$word</keyword>\n"
+                            output += "<keyword> $word </keyword>\n"
                             word = ""
                         } else if (content[i].isLetter() || content[i].equals('_')) {
                             while (i < content.length && !content[i].equals(' ') && !isSymbolExist(content[i])) {
                                 word += content[i]
                                 i++
                             }
-                            output += "\t<identifier>$word</identifier>\n"
+                            output += "<identifier> $word </identifier>\n"
                             word = ""
                             i--
                         }

@@ -1,5 +1,8 @@
 package jack_to_vm
 
+import parsing.ProgramStructure
+
 fun main(args: Array<String>) {
-    Tokenizing.tokenizing()
+    Tokenizing2.tokenizing()
+    ProgramStructure.tokenizing()
 }

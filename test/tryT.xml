@@ -1,0 +1,18 @@
+<tokens>
+<identifier> classA </identifier>
+<symbol> { </symbol>
+<keyword> var </keyword>
+<keyword> int </keyword>
+<identifier> b </identifier>
+<symbol> ; </symbol>
+<keyword> let </keyword>
+<identifier> b </identifier>
+<symbol> = </symbol>
+<StringConstant> kuku </StringConstant>
+<symbol> ; </symbol>
+<keyword> let </keyword>
+<identifier> b </identifier>
+<symbol> = </symbol>
+<integerConstant> 1234 </intergerConstant>
+<symbol> } </symbol>
+</tokens>
