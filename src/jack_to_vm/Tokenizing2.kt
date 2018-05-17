@@ -8,8 +8,9 @@ import java.util.regex.Pattern
 class Tokenizing2 {
     companion object {
         fun tokenizing() {
+
             var filePath = System.getProperty("user.dir")
-            filePath += "//out//test"
+            filePath += "//test"
             File(filePath).walk().forEach { fileJack ->
                 if (fileJack.isFile && fileJack.name.contains(".jack")) {
                     var outStream = FileWriter(filePath + "\\" + fileJack.name.removeSuffix(".jack") + "T.xml")
@@ -28,9 +29,9 @@ class Tokenizing2 {
             println(str  + "\n\n")
 
             var content = str
-            content = content.replace("//.*?\r\n".toRegex(), "\r\n")
-            content = content.replace("/\\*.*?\\*/".toRegex(), "\r\n")
-            content = content.replace("\r\n"," ")
+            content = content.replace("//.*?\r\n".toRegex(), "\n")
+            content = content.replace("/\\*.*?\\*/".toRegex(), "\n")
+            content = content.replace("\r?\n".toRegex()," ")
             content = content.replace("  *".toRegex(), " ")
             println(content)
 
@@ -74,32 +75,32 @@ class Tokenizing2 {
 
                     content[0].isDigit() -> {
                             val n = number()
-                        output += "<integerConstant> $n </intergerConstant>\n"
+                        output += tokBuild("integerConstant", n)
                     }
                     TokensWords.symbolList.contains(content[0]) -> {
-                        output += "<symbol> ${symbol(content[0])} </symbol>\n"
+                        output += tokBuild("symbol", symbol(content[0]))
                         content = content.substring(1)
                     }
                     content[0].equals('\"') -> {
                         val w = stringConstant()
-                        output += "<StringConstant> $w </StringConstant>"
+                        output += tokBuild("StringConstant", w)
                         content = content.substring(w.length + 1)
                         word = ""
                     }
                     else -> {
                         var w = ""
-                        while (content.isNotEmpty() && !content[0].equals(' ') && isSymbolExist(content[0])){
+                        while (content.isNotEmpty() && !content[0].equals(' ') && !isSymbolExist(content[0])){
                             w += content[0]
                             content = content.substring(1)
 
                         }
                         if (TokensWords.keywordsList.contains(w)){
-                            output += "<keyword> $w </keyword>\n"
+                            output += tokBuild("keyword", w)
                         }
                         else{
-                            output += "<identifier> $w </identifier>\n"
+                            output += tokBuild("identifier", w)
                         }
-                        content = content.substring(w.length)
+
 
                         /*TokensWords.keywordsList.forEach { keyword ->
 
@@ -148,6 +149,10 @@ class Tokenizing2 {
                     '"' -> "&quet"
                     else -> s.toString()
                 }
+        }
+
+        fun tokBuild(tok : String, cont : String) :String{
+            return "<$tok> $cont </$tok>\n"
         }
 
     }
