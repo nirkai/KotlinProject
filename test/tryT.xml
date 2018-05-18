@@ -13,6 +13,6 @@
 <keyword> let </keyword>
 <identifier> b </identifier>
 <symbol> = </symbol>
-<integerConstant> 1234 </intergerConstant>
+<integerConstant> 1234 </integerConstant>
 <symbol> } </symbol>
 </tokens>
