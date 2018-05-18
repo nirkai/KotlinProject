@@ -13,7 +13,7 @@ class Tokenizing {
             //println(str)
 
             var filePath = System.getProperty("user.dir")
-            filePath += "//out//test"
+            filePath += "//test"
             File(filePath).walk().forEach { fileJack ->
                 if (fileJack.isFile && fileJack.name.contains(".jack")) {
                     var outStream = FileWriter(filePath + "\\" + fileJack.name.removeSuffix(".jack") + "T.xml")
@@ -118,7 +118,7 @@ class Tokenizing {
                         output += "<integerConstant> $word </intergerConstant>\n"
                         word = ""
                     } else if (TokensWords.symbolList.contains(content[i])) {
-                        output += "<symbol> ${content[i].toString()} </symbol>\n"
+                        output += "<symbol> ${symbol(content[i])} </symbol>\n"
                     } else if (content[i].equals('\"')) {
                         i = stringConstant(i)
                         output += "<StringConstant> $word </StringConstant>\n"
@@ -162,6 +162,16 @@ class Tokenizing {
                     return true
             }
             return false
+        }
+
+        fun symbol(s : Char) : String{
+            return when (s){
+                '>' -> "&gt"
+                '<' -> "&lt"
+                '&' -> "amp"
+                '"' -> "&quet"
+                else -> s.toString()
+            }
         }
     }
 
