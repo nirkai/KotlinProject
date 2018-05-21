@@ -1,10 +1,14 @@
 package parsing
 
+import parsing.Statements.Companion.statments
 import java.io.File
+import java.io.FileWriter
 
 class ProgramStructure {
+
     companion object {
-        var inputFile : String = ""
+        var tab : Int = 0
+        @JvmStatic var inputFile = ""
 
         fun tokenizing() {
 
@@ -13,7 +17,7 @@ class ProgramStructure {
             File(filePath).walk().forEach { fileJack ->
                 if (fileJack.isFile && fileJack.name.contains("T.xml")) {
                     inputFile = fileJack.readText()
-
+                    var g = fileJack.readText()
 
                     /*val lineList = mutableListOf<String>()
                     var hackProgramString = ""
@@ -25,30 +29,32 @@ class ProgramStructure {
                     }*/
 
 
-                   /* var outStream = FileWriter(filePath + "\\" + fileJack.name.removeSuffix("T.xml") + ".xml")
-                    outStream.write("<tokens>\n")
-                    var output = Tokenizing.jackToTok(fileJack)
-                    outStream.append(output + "</tokens>\n")
-                    outStream.close()*/
+                    var outStream = FileWriter(filePath + "\\" + fileJack.name.removeSuffix("T.xml") + ".xml")
+                    outStream.write(parseClass())
+                    outStream.close()
                 }
             }
         }
 
         fun parseClass() : String {
             getNextToken()
+            tab++
             var output = "<class>\n" +
                     getNextToken() + getNextToken() + getNextToken()
             output += parseClassVarDec()
 
-
+            while (checkNextToken().contains("method|function|constructor".toRegex())){
+                output += subroutineDec()
+            }
             output += getNextToken()
-            output += "</class>"
+            output += "</class>\n"
             return  output
         }
 
         fun getNextToken() : String {
-            var s = inputFile.substring(0, inputFile.indexOf("\n"))
-            inputFile = inputFile.substring(inputFile.indexOf("\n"))
+            var s = inputFile.substring(0, inputFile.indexOf("\n")+1)
+            var g = inputFile.substring(inputFile.indexOf("\n")+1)
+            inputFile = g
             return s
         }
 
@@ -59,103 +65,51 @@ class ProgramStructure {
         fun parseClassVarDec() : String{
             var output = ""
             while (checkNextToken().contains("static|field".toRegex())){
-                output += "<classVarDec>"
+                output += "<classVarDec>\n"
                 output += getNextToken() + getNextToken() + getNextToken()
                 while (checkNextToken().contains(",")){
                     output += getNextToken() + getNextToken()
                 }
-                output += getNextToken() + "</classVarDec>"
+                output += getNextToken() +      // ;
+                        "</classVarDec>\n"
             }
             return output
         }
 
-        fun subroutineDec(){
-
-        }
-
-        fun expression() : String{
-            var output = "<expression>\n"
-            output += term()
-            while (checkNextToken().contains("\\+|-|\\*|/|&|\\||<|>|=".toRegex())){
-                output += getNextToken()
-                output += term()
-            }
-            output += "</expression>\n"
+        fun subroutineDec() :String {
+            var output = "<subroutineDec>\n"
+                output += getNextToken() + getNextToken() + getNextToken() +     // method|function|constructor void|type subroutineName
+                    getNextToken() + parameterList() + getNextToken() +          // ( parameterList )
+                    subroutineBody() + "</subroutineDec>\n"
             return output
         }
 
-        fun term () :String{
-            var s = checkNextToken()
-            var output = when {
-                s.contains("integerConstant|stringConstant".toRegex()) -> getNextToken()
-                s.contains("(") -> getNextToken() + expression() + getNextToken()
-                keyWordConstant() -> getNextToken()
-                unaryOp() -> getNextToken() + term()
-                else -> {
-                        var ident = getNextToken()
-                        if (ident.contains("[")) {
-                                ident += getNextToken()
-                            ident += expression()
-                            ident += getNextToken() // ) or ]
-                            ident
-                        }
-                        else {
-                            ident += subroutineCall()
-                            ident
-                        }
-                    }
-                }
-            return output
-        }
-
-        fun keyWordConstant():Boolean{
-            return checkNextToken().contains("true|false|null|this".toRegex())
-        }
-/*
-
-        fun varName():Boolean{
-            return isIdentifier()
-        }
-
-        fun className():Boolean{
-            return isIdentifier() && checkNextToken().contains("class")
-        }
-
-        fun subroutineName() : Boolean {
-            return isIdentifier()
-        }
-*/
-
-        fun subroutineCall() : String {
-            var ident = getNextToken()
-            return when {
-                checkNextToken().contains("(") -> {     // subroutineName
-                    ident +
-                            getNextToken() +    // (
-                            expressionList() +  // expressionList
-                            getNextToken()      // )
-
-                }
-                checkNextToken().contains(".") -> ident + getNextToken() + getNextToken() +           //  className | varName
-                        getNextToken() + expressionList() + getNextToken()  //  className | varName . subroutineName ( expressionList )
-                else -> ""
+        fun parameterList() :String{
+            var parm = "<parameterList>\n"
+            if (checkNextToken().contains("void|int|boolean|char|identifier".toRegex())){
+                parm += getNextToken() + getNextToken()     //  type varName
+                while (checkNextToken().contains(","))
+                    parm += getNextToken() + getNextToken() + getNextToken()    //  , type varName
             }
+            return parm + "</parameterList>\n"
         }
 
-        fun isIdentifier() : Boolean {
-            return checkNextToken().contains("identifier")
+        fun subroutineBody():String{
+            var body = "<subroutineBody>\n" + getNextToken()    //  {
+            while (checkNextToken().contains("var"))
+                body += varDec()
+            body += statments()
+            body += getNextToken() + "</subroutineBody>\n"
+            return body
         }
 
-        fun unaryOp() : Boolean {
-            return checkNextToken().contains("-|~".toRegex())
+        fun varDec() :String{
+            var dec = "<varDec>\n" + getNextToken() + getNextToken() + getNextToken()  //  var type varName
+            while (checkNextToken().contains(","))
+                dec += getNextToken() + getNextToken()                  // , varName
+            dec += getNextToken() + "</varDec>\n"                       // ;
+            return dec
         }
 
-        fun expressionList() : String{
-            var expr = expression()         // can be empty. the empty content will return from the subroutineCall function
-            while (checkNextToken().contains(",")){
-                expr += getNextToken() + expression()
-            }
-            return expr
-        }
     }
 }
