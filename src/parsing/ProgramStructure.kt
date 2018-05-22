@@ -1,6 +1,6 @@
 package parsing
 
-import parsing.Statements.Companion.statments
+import parsing.Statements.Companion.statements
 import java.io.File
 import java.io.FileWriter
 
@@ -37,13 +37,13 @@ class ProgramStructure {
         }
 
         fun parseClass() : String {
-            getNextToken()
             tab++
+            getNextToken()
             var output = "<class>\n" +
                     getNextToken() + getNextToken() + getNextToken()
             output += parseClassVarDec()
 
-            while (checkNextToken().contains("method|function|constructor".toRegex())){
+            while (checkNextToken().contains("method|function|constructor".toRegex()) && !inputFile.equals("</tokens>\n")){
                 output += subroutineDec()
             }
             output += getNextToken()
@@ -52,64 +52,80 @@ class ProgramStructure {
         }
 
         fun getNextToken() : String {
+            if (inputFile.equals("</tokens>\n"))
+                return ""
             var s = inputFile.substring(0, inputFile.indexOf("\n")+1)
             var g = inputFile.substring(inputFile.indexOf("\n")+1)
             inputFile = g
-            return s
+            return space.repeat(tab) + s
         }
 
         fun checkNextToken() : String {
+            if (inputFile.equals("</tokens>\n"))
+                return ""
             return inputFile.substring(0, inputFile.indexOf("\n"))
+        }
+
+        fun checkFollow1Token() : String {
+            if (inputFile.equals("</tokens>\n"))
+                return ""
+            var dump = inputFile.substring(inputFile.indexOf("\n") + 1)
+            return dump.substring(0, inputFile.indexOf("\n"))
         }
 
         fun parseClassVarDec() : String{
             var output = ""
-            while (checkNextToken().contains("static|field".toRegex())){
-                output += "<classVarDec>\n"
+            while (checkNextToken().contains("static|field".toRegex()) && !inputFile.equals("</tokens>\n")){
+                output += incTab() + "<classVarDec>\n"
                 output += getNextToken() + getNextToken() + getNextToken()
-                while (checkNextToken().contains(",")){
+                while (checkNextToken().contains(",")&& !inputFile.equals("</tokens>\n")){
                     output += getNextToken() + getNextToken()
                 }
                 output += getNextToken() +      // ;
-                        "</classVarDec>\n"
+                        decTab() + "</classVarDec>\n"
             }
             return output
         }
 
         fun subroutineDec() :String {
-            var output = "<subroutineDec>\n"
+            var output = incTab() + "<subroutineDec>\n"
                 output += getNextToken() + getNextToken() + getNextToken() +     // method|function|constructor void|type subroutineName
                     getNextToken() + parameterList() + getNextToken() +          // ( parameterList )
-                    subroutineBody() + "</subroutineDec>\n"
+                    subroutineBody() + decTab() + "</subroutineDec>\n"
             return output
         }
 
         fun parameterList() :String{
-            var parm = "<parameterList>\n"
+            var parm = incTab() + "<parameterList>\n"
             if (checkNextToken().contains("void|int|boolean|char|identifier".toRegex())){
                 parm += getNextToken() + getNextToken()     //  type varName
                 while (checkNextToken().contains(","))
                     parm += getNextToken() + getNextToken() + getNextToken()    //  , type varName
             }
-            return parm + "</parameterList>\n"
+            return parm + decTab() + "</parameterList>\n"
         }
 
         fun subroutineBody():String{
-            var body = "<subroutineBody>\n" + getNextToken()    //  {
+            var body = incTab() + "<subroutineBody>\n" + getNextToken()    //  {
             while (checkNextToken().contains("var"))
                 body += varDec()
-            body += statments()
-            body += getNextToken() + "</subroutineBody>\n"
+            body += statements()
+            body += getNextToken() + decTab() + "</subroutineBody>\n"
             return body
         }
 
         fun varDec() :String{
-            var dec = "<varDec>\n" + getNextToken() + getNextToken() + getNextToken()  //  var type varName
+            var dec = incTab() + "<varDec>\n" + getNextToken() + getNextToken() + getNextToken()  //  var type varName
             while (checkNextToken().contains(","))
                 dec += getNextToken() + getNextToken()                  // , varName
-            dec += getNextToken() + "</varDec>\n"                       // ;
+            dec += getNextToken() + decTab() + "</varDec>\n"                       // ;
             return dec
         }
 
+        fun incTab() = space.repeat(tab++)
+
+        fun decTab() = space.repeat(--tab)
+
+        private var space = "  "
     }
 }
