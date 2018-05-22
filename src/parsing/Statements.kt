@@ -5,71 +5,73 @@ import parsing.Expressions.Companion.expression
 import parsing.Expressions.Companion.subroutineCall
 import parsing.ProgramStructure.Companion.checkNextToken
 import parsing.ProgramStructure.Companion.getNextToken
+import parsing.ProgramStructure.Companion.decTab
+import parsing.ProgramStructure.Companion.incTab
 
 class Statements {
     companion object {
-        fun statments() :String{
-            var stat = ""
-            var tmp = statment()
+        fun statements() :String{
+            var stat = incTab()
+            var tmp = statement()
             if (tmp != "")
-                stat += "<statments>\n"
+                stat += "<statements>\n"
             while (tmp != ""){
                 stat += tmp
-                tmp = statment()
+                tmp = statement()
             }
             if (stat != "")
-                stat += "</statments>\n"
+                stat += decTab() + "</statements>\n"
             return stat
         }
 
-        fun statment() : String{
+        fun statement() : String{
             val stat = checkNextToken()
             val x = when {
-                stat.contains("let") -> letStatment()
-                stat.contains("if") -> ifStatment()
-                stat.contains("while") -> whileStatment()
-                stat.contains("do") -> doStatment()
-                stat.contains("return") -> returnStatment()
+                stat.contains("let") -> letStatement()
+                stat.contains("if") -> ifStatement()
+                stat.contains("while") -> whileStatement()
+                stat.contains("do") -> doStatement()
+                stat.contains("return") -> returnStatement()
                 else -> ""
             }
             return x
         }
 
-        fun letStatment() :String {
-            var stat = "<letStatment>\n" + getNextToken() + getNextToken()
-            if (checkNextToken().equals("["))
+        fun letStatement() :String {
+            var stat = incTab() + "<letStatement>\n" + getNextToken() + getNextToken()     // let varName
+            if (checkNextToken().contains(" [ "))
                 stat += getNextToken() + expression() + getNextToken()  //  [ expression ]
             stat += getNextToken() + expression() + getNextToken()      // = expression ;
-            return stat
+            return stat + decTab() + "</letStatement>\n"
         }
 
-        fun ifStatment() : String {
-            var stat = "<ifStatment>\n" + tempIfWhile()
+        fun ifStatement() : String {
+            var stat = incTab() + "<ifStatement>\n" + tempIfWhile()
             if (checkNextToken().contains("else"))
-                stat += getNextToken() + getNextToken() + statments() + getNextToken() +    //  else { statment }
-                        "</ifStatment>\n"
-            return stat
+                stat += getNextToken() + getNextToken() + statements() + getNextToken()    //  else { statement }
+
+            return stat + decTab() + "</ifStatement>\n"
         }
 
-        fun whileStatment() : String{
-            return "<whileStatment>\n" + tempIfWhile() + "</whileStatment>\n"
+        fun whileStatement() : String{
+            return incTab() + "<whileStatement>\n" + tempIfWhile() + decTab() + "</whileStatement>\n"
         }
 
         fun tempIfWhile() : String{
             return getNextToken() +
                     getNextToken() + expression() + getNextToken() +    //  ( expression )
-                    getNextToken() + statments() + getNextToken()    //  { statments }
+                    getNextToken() + statements() + getNextToken()    //  { statements }
         }
 
-        fun doStatment() : String {
-            return "<doStatment>\n" + getNextToken() + subroutineCall() + getNextToken() + "/<doStatment>\n"
+        fun doStatement() : String {
+            return incTab() + "<doStatement>\n" + getNextToken() + subroutineCall() + getNextToken() + decTab() + "</doStatement>\n"  // do subroutine ;
         }
 
-        fun returnStatment() : String {
-            var stat = "<returnStatment>\n" + getNextToken()
-            if (checkNextToken().contains(";"))
-                return stat + getNextToken() + "</returnStatment>\n"
-            return stat + expression() + getNextToken() + "</returnStatment>\n"
+        fun returnStatement() : String {
+            var stat = incTab() + "<returnStatement>\n" + getNextToken()
+            if (!checkNextToken().contains(" ; "))
+                stat += expression()
+            return stat + getNextToken() + decTab() + "</returnStatement>\n"
         }
 
     }

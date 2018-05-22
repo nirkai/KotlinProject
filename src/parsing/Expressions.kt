@@ -1,31 +1,38 @@
 package parsing
 
+import parsing.ProgramStructure.Companion.checkFollow1Token
+import parsing.ProgramStructure.Companion.checkNextToken
+import parsing.ProgramStructure.Companion.decTab
+import parsing.ProgramStructure.Companion.getNextToken
+import parsing.ProgramStructure.Companion.incTab
+import parsing.ProgramStructure.Companion.tab
+
 class Expressions {
     companion object {
         fun expression() : String{
-            var output = "<expression>\n"
+            var output = incTab() + "<expression>\n"
             output += term()
-            while (ProgramStructure.checkNextToken().contains("\\+|-|\\*|/|&|\\||<|>|=".toRegex())){
-                output += ProgramStructure.getNextToken()
+            while (checkNextToken().contains(" \\+ | - | \\* | / | &amp; | \\| | &lt; | &gt; | = ".toRegex())){
+                output += getNextToken()    // op
                 output += term()
             }
-            output += "</expression>\n"
-            return output
+            return output + decTab() + "</expression>\n"
         }
 
         fun term () :String{
-            var s = ProgramStructure.checkNextToken()
-            var output = when {
-                s.contains("integerConstant|stringConstant".toRegex()) -> ProgramStructure.getNextToken()
-                s.contains("(") -> ProgramStructure.getNextToken() + expression() + ProgramStructure.getNextToken()
-                keyWordConstant() -> ProgramStructure.getNextToken()
-                unaryOp() -> ProgramStructure.getNextToken() + term()
+            var s = checkNextToken()
+            var output = incTab() + "<term>\n" +
+                    when {
+                s.contains("integerConstant|stringConstant".toRegex()) -> getNextToken()
+                s.contains("(") -> getNextToken() + expression() + getNextToken()
+                keyWordConstant() -> getNextToken()
+                unaryOp() -> getNextToken() + term()
                 isIdentifier() -> {
-                    var ident = ProgramStructure.getNextToken()
-                    if (ProgramStructure.checkNextToken().contains("[")) {
-                        ident += ProgramStructure.getNextToken()
-                        ident += expression()
-                        ident += ProgramStructure.getNextToken() // ]
+                    var ident = ""
+                    if (checkFollow1Token().contains("[")) {
+                        ident += getNextToken() + getNextToken()    // varName [
+                        ident += expression()                       //  expression
+                        ident += getNextToken()                     // ]
                         ident
                     }
                     else {
@@ -35,11 +42,13 @@ class Expressions {
                 }
                 else -> ""
             }
-            return output
+            if (output.equals("<term>\n"))
+                return ""
+            return output + decTab() + "</term>\n"
         }
 
         fun keyWordConstant():Boolean{
-            return ProgramStructure.checkNextToken().contains("true|false|null|this".toRegex())
+            return checkNextToken().contains("true|false|null|this".toRegex())
         }
 /*
 
@@ -57,36 +66,38 @@ class Expressions {
 */
 
         fun subroutineCall() : String {
-            var ident = ""
-            var x = when {
-                ProgramStructure.checkNextToken().contains("(") -> {     // subroutineName
-                    ident +
-                            ProgramStructure.getNextToken() +    // (
+            var ident = getNextToken()
+            var s = checkNextToken()
+            ident += when {
+                s.contains(" ( ") -> {     // subroutineName
+                            getNextToken() +    // (
                             expressionList() +  // expressionList
-                            ProgramStructure.getNextToken()      // )
+                            getNextToken()      // )
 
                 }
-                ProgramStructure.checkNextToken().contains(".") -> ident + ProgramStructure.getNextToken() + ProgramStructure.getNextToken() +           //  className | varName
-                        ProgramStructure.getNextToken() + expressionList() + ProgramStructure.getNextToken()  //  className | varName . subroutineName ( expressionList )
+                s.contains(".") -> getNextToken() + getNextToken() +           //  className | varName
+                        getNextToken() + expressionList() + getNextToken()  //  className | varName . subroutineName ( expressionList )
                 else -> ""
             }
-            if (x != "")
-                return label("subroutineCall", x)
-            return x
+            /*if (x != "")
+                return label("subroutineCall", x)*/
+            return ident
         }
 
         fun isIdentifier() : Boolean {
-            return ProgramStructure.checkNextToken().contains("identifier")
+            return checkNextToken().contains("identifier")
         }
 
         fun unaryOp() : Boolean {
-            return ProgramStructure.checkNextToken().contains("-|~".toRegex())
+            return checkNextToken().contains("-|~".toRegex())
         }
 
         fun expressionList() : String{
+            if (checkNextToken().contains(" ) "))
+                return label("expressionList", "")
             var expr = expression()         // can be empty. the empty content will returned from the subroutineCall function
-            while (expr != "" && ProgramStructure.checkNextToken().contains(",")){
-                expr += ProgramStructure.getNextToken() + expression()
+            while (expr != "" && checkNextToken().contains(",")){
+                expr += getNextToken() + expression()
             }
             if (expr != ""){
                 return label("expressionList", expr)
@@ -95,7 +106,7 @@ class Expressions {
         }
 
         fun label(tok : String, cont : String) : String {
-            return "<$tok>\n $cont </$tok>\n"
+            return incTab() + "<$tok>\n $cont" + decTab() +  " </$tok>\n"
         }
     }
 }

@@ -166,10 +166,10 @@ class Tokenizing {
 
         fun symbol(s : Char) : String{
             return when (s){
-                '>' -> "&gt"
-                '<' -> "&lt"
-                '&' -> "amp"
-                '"' -> "&quet"
+                '>' -> "&gt;"
+                '<' -> "&lt;"
+                '&' -> "&amp;"
+                '"' -> "&quet;"
                 else -> s.toString()
             }
         }

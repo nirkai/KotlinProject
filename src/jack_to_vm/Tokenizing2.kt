@@ -8,8 +8,7 @@ import java.util.regex.Pattern
 class Tokenizing2 {
     companion object {
         fun tokenizing() {
-
-            var filePath = System.getProperty("user.dir")
+           var filePath = System.getProperty("user.dir")
             filePath += "//test"
             File(filePath).walk().forEach { fileJack ->
                 if (fileJack.isFile && fileJack.name.contains(".jack")) {
@@ -29,8 +28,8 @@ class Tokenizing2 {
             println(str  + "\n\n")
 
             var content = str
-            content = content.replace("//.*?\r\n".toRegex(), "\n")
-            content = content.replace("/\\*.*?\\*/".toRegex(), "\n")
+            content = content.replace("//.*?\r?\n".toRegex(), "\n")
+            content = content.replace("/\\*(?s).*?\\*/".toRegex(), "\n")
             content = content.replace("\r?\n".toRegex()," ")
             content = content.replace("  *".toRegex(), " ")
             println(content)
@@ -143,10 +142,10 @@ class Tokenizing2 {
 
         fun symbol(s : Char) : String{
             return when (s){
-                    '>' -> "&gt"
-                    '<' -> "&lt"
-                    '&' -> "amp"
-                    '"' -> "&quet"
+                    '>' -> "&gt;"
+                    '<' -> "&lt;"
+                    '&' -> "&amp;"
+                    '"' -> "&quet;"
                     else -> s.toString()
                 }
         }
