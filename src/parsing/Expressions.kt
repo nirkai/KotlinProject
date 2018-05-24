@@ -5,23 +5,22 @@ import parsing.ProgramStructure.Companion.checkNextToken
 import parsing.ProgramStructure.Companion.decTab
 import parsing.ProgramStructure.Companion.getNextToken
 import parsing.ProgramStructure.Companion.incTab
-import parsing.ProgramStructure.Companion.tab
 
 class Expressions {
     companion object {
         fun expression() : String{
-            var output = incTab() + "<expression>\n"
+            var output = incTab("expression")
             output += term()
             while (checkNextToken().contains(" \\+ | - | \\* | / | &amp; | \\| | &lt; | &gt; | = ".toRegex())){
                 output += getNextToken()    // op
                 output += term()
             }
-            return output + decTab() + "</expression>\n"
+            return output + decTab("expression")
         }
 
         fun term () :String{
             var s = checkNextToken()
-            var output = incTab() + "<term>\n" +
+            var output = incTab("term") +
                     when {
                 s.contains("integerConstant|stringConstant".toRegex()) -> getNextToken()
                 s.contains("(") -> getNextToken() + expression() + getNextToken()
@@ -44,7 +43,7 @@ class Expressions {
             }
             if (output.equals("<term>\n"))
                 return ""
-            return output + decTab() + "</term>\n"
+            return output + decTab("term")
         }
 
         fun keyWordConstant():Boolean{
@@ -95,18 +94,21 @@ class Expressions {
         fun expressionList() : String{
             if (checkNextToken().contains(" ) "))
                 return label("expressionList", "")
-            var expr = expression()         // can be empty. the empty content will returned from the subroutineCall function
+            incTab()
+            var expr = expression()
             while (expr != "" && checkNextToken().contains(",")){
                 expr += getNextToken() + expression()
             }
             if (expr != ""){
-                return label("expressionList", expr)
+                decTab()
+                expr = incTab("expressionList") + expr + decTab("expressionList")
+                //return label("expressionList", expr)
             }
             return expr
         }
 
         fun label(tok : String, cont : String) : String {
-            return incTab() + "<$tok>\n $cont" + decTab() +  " </$tok>\n"
+            return "${incTab(tok)}$cont${decTab(tok)}"
         }
     }
 }

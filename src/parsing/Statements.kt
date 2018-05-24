@@ -38,23 +38,23 @@ class Statements {
         }
 
         fun letStatement() :String {
-            var stat = incTab() + "<letStatement>\n" + getNextToken() + getNextToken()     // let varName
+            var stat = incTab("letStatement") + getNextToken() + getNextToken()     // let varName
             if (checkNextToken().contains(" [ "))
                 stat += getNextToken() + expression() + getNextToken()  //  [ expression ]
             stat += getNextToken() + expression() + getNextToken()      // = expression ;
-            return stat + decTab() + "</letStatement>\n"
+            return stat + decTab("letStatement")
         }
 
         fun ifStatement() : String {
-            var stat = incTab() + "<ifStatement>\n" + tempIfWhile()
+            var stat = incTab("ifStatement") + tempIfWhile()
             if (checkNextToken().contains("else"))
                 stat += getNextToken() + getNextToken() + statements() + getNextToken()    //  else { statement }
 
-            return stat + decTab() + "</ifStatement>\n"
+            return stat + decTab("ifStatement")
         }
 
         fun whileStatement() : String{
-            return incTab() + "<whileStatement>\n" + tempIfWhile() + decTab() + "</whileStatement>\n"
+            return incTab("whileStatement") + tempIfWhile() + decTab("whileStatement")
         }
 
         fun tempIfWhile() : String{
@@ -64,14 +64,14 @@ class Statements {
         }
 
         fun doStatement() : String {
-            return incTab() + "<doStatement>\n" + getNextToken() + subroutineCall() + getNextToken() + decTab() + "</doStatement>\n"  // do subroutine ;
+            return incTab("doStatement") + getNextToken() + subroutineCall() + getNextToken() + decTab("doStatement")  // do subroutine ;
         }
 
         fun returnStatement() : String {
-            var stat = incTab() + "<returnStatement>\n" + getNextToken()
+            var stat = incTab("returnStatement") + getNextToken()
             if (!checkNextToken().contains(" ; "))
                 stat += expression()
-            return stat + getNextToken() + decTab() + "</returnStatement>\n"
+            return stat + getNextToken() + decTab("returnStatement")
         }
 
     }
