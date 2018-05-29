@@ -10,10 +10,10 @@ class ProgramStructure {
         var tab : Int = 0
         @JvmStatic var inputFile = ""
 
-        fun tokenizing() {
+        fun tokenizing(filePath : String) {
 
-            var filePath = System.getProperty("user.dir")
-            filePath += "//test"
+            //var filePath = System.getProperty("user.dir")
+            //filePath += "//test"
             File(filePath).walk().forEach { fileJack ->
                 if (fileJack.isFile && fileJack.name.contains("T.xml")) {
                     inputFile = fileJack.readText()
@@ -41,13 +41,13 @@ class ProgramStructure {
             getNextToken()
             //tab++
             var output = incTab("class") +
-                    getNextToken() + getNextToken() + getNextToken()
+                    getNextToken() + getNextToken() + getNextToken()       //   class className {
             output += parseClassVarDec()
 
             while (checkNextToken().contains("method|function|constructor".toRegex()) && !inputFile.equals("</tokens>\n")){
                 output += subroutineDec()
             }
-            output += getNextToken()
+            output += getNextToken()        //  }
             output += decTab("class")
             return  output
         }
@@ -96,7 +96,7 @@ class ProgramStructure {
         fun parameterList() :String{
             var parm = incTab("parameterList")
             if (checkNextToken().contains("void|int|boolean|char|identifier".toRegex())){
-                parm += getNextToken() + getNextToken()     //  type varName
+                parm += getNextToken() + getNextToken()                         //  type varName
                 while (checkNextToken().contains(","))
                     parm += getNextToken() + getNextToken() + getNextToken()    //  , type varName
             }
@@ -108,7 +108,8 @@ class ProgramStructure {
             while (checkNextToken().contains("var"))
                 body += varDec()
             body += statements()
-            body += getNextToken() + decTab("subroutineBody")
+            body += getNextToken() +                // }
+                    decTab("subroutineBody")
             return body
         }
 

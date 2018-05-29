@@ -7,9 +7,9 @@ import java.util.regex.Pattern
 
 class Tokenizing2 {
     companion object {
-        fun tokenizing() {
-           var filePath = System.getProperty("user.dir")
-            filePath += "//test"
+        fun tokenizing(filePath : String) {
+          // var filePath = System.getProperty("user.dir")
+          //  filePath += "//test"
             File(filePath).walk().forEach { fileJack ->
                 if (fileJack.isFile && fileJack.name.contains(".jack")) {
                     var outStream = FileWriter(filePath + "\\" + fileJack.name.removeSuffix(".jack") + "T.xml")
@@ -31,6 +31,7 @@ class Tokenizing2 {
             content = content.replace("//.*?\r?\n".toRegex(), "\n")
             content = content.replace("/\\*(?s).*?\\*/".toRegex(), "\n")
             content = content.replace("\r?\n".toRegex()," ")
+            content = content.replace("\t".toRegex()," ")
             content = content.replace("  *".toRegex(), " ")
             println(content)
 
@@ -82,7 +83,7 @@ class Tokenizing2 {
                     }
                     content[0].equals('\"') -> {
                         val w = stringConstant()
-                        output += tokBuild("StringConstant", w)
+                        output += tokBuild("stringConstant", w)
                         content = content.substring(w.length + 1)
                         word = ""
                     }

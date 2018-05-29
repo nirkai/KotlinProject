@@ -40,8 +40,8 @@ class Statements {
         fun letStatement() :String {
             var stat = incTab("letStatement") + getNextToken() + getNextToken()     // let varName
             if (checkNextToken().contains(" [ "))
-                stat += getNextToken() + expression() + getNextToken()  //  [ expression ]
-            stat += getNextToken() + expression() + getNextToken()      // = expression ;
+                stat += getNextToken() + expression() + getNextToken()                  //  [ expression ]
+            stat += getNextToken() + expression() + getNextToken()                      //  = expression ;
             return stat + decTab("letStatement")
         }
 
@@ -49,7 +49,6 @@ class Statements {
             var stat = incTab("ifStatement") + tempIfWhile()
             if (checkNextToken().contains("else"))
                 stat += getNextToken() + getNextToken() + statements() + getNextToken()    //  else { statement }
-
             return stat + decTab("ifStatement")
         }
 
@@ -58,20 +57,24 @@ class Statements {
         }
 
         fun tempIfWhile() : String{
-            return getNextToken() +
+            return getNextToken() +                                     // if | while
                     getNextToken() + expression() + getNextToken() +    //  ( expression )
-                    getNextToken() + statements() + getNextToken()    //  { statements }
+                    getNextToken() + statements() + getNextToken()      //  { statements }
         }
 
         fun doStatement() : String {
-            return incTab("doStatement") + getNextToken() + subroutineCall() + getNextToken() + decTab("doStatement")  // do subroutine ;
+            return incTab("doStatement") +
+                    getNextToken() + subroutineCall() + getNextToken() +   // do subroutine ;
+                    decTab("doStatement")
         }
 
         fun returnStatement() : String {
-            var stat = incTab("returnStatement") + getNextToken()
+            var stat = incTab("returnStatement") +
+                    getNextToken()                          // return
             if (!checkNextToken().contains(" ; "))
-                stat += expression()
-            return stat + getNextToken() + decTab("returnStatement")
+                stat += expression()                        // expression ?
+            return stat + getNextToken() +                  // ;
+                    decTab("returnStatement")
         }
 
     }
