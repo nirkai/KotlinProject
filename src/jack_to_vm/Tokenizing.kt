@@ -6,14 +6,14 @@ import java.io.IOException
 
 class Tokenizing {
     companion object {
-        fun tokenizing() {
+        fun tokenizing(filePath : String) {
             //var str = "father went /* blabla */ to work"
             //str = str.replace("/\\*.*?\\*/".toRegex(), "")
             //str = str.replaceRange(str.indexOf("//")..str.indexOf("\n"), "")
             //println(str)
 
-            var filePath = System.getProperty("user.dir")
-            filePath += "//test"
+            //var filePath = System.getProperty("user.dir")
+            //filePath += "//test"
             File(filePath).walk().forEach { fileJack ->
                 if (fileJack.isFile && fileJack.name.contains(".jack")) {
                     var outStream = FileWriter(filePath + "\\" + fileJack.name.removeSuffix(".jack") + "T.xml")
@@ -30,9 +30,9 @@ class Tokenizing {
             var word: String = "";
             val str = fileJack.readText()
             var content = str
-            content = content.replace("//.*?\r\n".toRegex(), "\r\n")
-            content = content.replace("/\\*.*?\\*/".toRegex(), "\r\n")
-            content = content.replace("\r\n"," ")
+            content = content.replace("//.*?\r?\n".toRegex(), "\n")
+            content = content.replace("/\\*(?s).*?\\*/".toRegex(), "\n")
+            content = content.replace("\r?\n".toRegex()," ")
             content = content.replace("  *".toRegex(), " ")
             println(content)
 
@@ -115,13 +115,13 @@ class Tokenizing {
                     } else if (content.get(i).isDigit()) {
                         word += content[i].toString()
                         i = number(i)
-                        output += "<integerConstant> $word </intergerConstant>\n"
+                        output += "<integerConstant> $word </integerConstant>\n"
                         word = ""
                     } else if (TokensWords.symbolList.contains(content[i])) {
                         output += "<symbol> ${symbol(content[i])} </symbol>\n"
                     } else if (content[i].equals('\"')) {
                         i = stringConstant(i)
-                        output += "<StringConstant> $word </StringConstant>\n"
+                        output += "<stringConstant> $word </stringConstant>\n"
                         word = ""
                     } else {
                         TokensWords.keywordsList.forEach { keyword ->

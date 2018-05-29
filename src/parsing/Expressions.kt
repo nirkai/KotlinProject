@@ -21,26 +21,26 @@ class Expressions {
         fun term () :String{
             var s = checkNextToken()
             var output = incTab("term") +
-                    when {
-                s.contains("integerConstant|stringConstant".toRegex()) -> getNextToken()
-                s.contains("(") -> getNextToken() + expression() + getNextToken()
-                keyWordConstant() -> getNextToken()
-                unaryOp() -> getNextToken() + term()
-                isIdentifier() -> {
-                    var ident = ""
-                    if (checkFollow1Token().contains("[")) {
-                        ident += getNextToken() + getNextToken()    // varName [
-                        ident += expression()                       //  expression
-                        ident += getNextToken()                     // ]
-                        ident
+                    when {                      //  return the string of one of the cases
+                            s.contains("integerConstant|stringConstant".toRegex()) -> getNextToken()    //  integerConstant | stringConstant
+                            s.contains("(")   -> getNextToken() + expression() + getNextToken()   // ( expression )
+                            keyWordConstant()       -> getNextToken()                                   //  keywordConstant
+                            unaryOp()               -> getNextToken() + term()
+                            isIdentifier()          -> {
+                                                        var ident = ""
+                                                        if (checkFollow1Token().contains("[")) {
+                                                            ident += getNextToken() + getNextToken()    // varName [
+                                                            ident += expression()                       //  expression
+                                                            ident += getNextToken()                     // ]
+                                                            ident
+                                                        }
+                                                        else {
+                                                            ident += subroutineCall()
+                                                            ident
+                                                        }
+                                                    }
+                            else -> ""
                     }
-                    else {
-                        ident += subroutineCall()
-                        ident
-                    }
-                }
-                else -> ""
-            }
             if (output.equals("<term>\n"))
                 return ""
             return output + decTab("term")
