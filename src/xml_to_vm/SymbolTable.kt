@@ -14,6 +14,7 @@ class SymbolTable {
 
     public fun define(name: String, type : String, kind : String) {
 
+        map
     }
 
 
