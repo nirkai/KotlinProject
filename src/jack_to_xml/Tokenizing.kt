@@ -1,4 +1,4 @@
-package jack_to_vm
+package jack_to_xml
 
 import java.io.File
 import java.io.FileWriter

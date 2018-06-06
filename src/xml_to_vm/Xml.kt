@@ -1,6 +1,5 @@
-package jack_to_vm
+package xml_to_vm
 
-import parsing.ProgramStructure
 import java.nio.file.Files
 import java.nio.file.Paths
 
@@ -20,6 +19,5 @@ fun main(args: Array<String>) {
         }
     }
 
-    Tokenizing2.tokenizing(filePath)
-    ProgramStructure.tokenizing(filePath)
+
 }
