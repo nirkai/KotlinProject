@@ -5,6 +5,11 @@ import java.nio.file.Paths
 
 fun main(args: Array<String>) {
 
+    var k = Kind.VAR
+    println(k)
+    var x = k.toString()
+    var y = k.name
+
     var filePath = System.getProperty("user.dir")
 
     if (args.size > 0){
@@ -18,6 +23,8 @@ fun main(args: Array<String>) {
             return
         }
     }
+
+
 
 
 }
