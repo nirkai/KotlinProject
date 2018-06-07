@@ -2,6 +2,7 @@ package xml_to_vm
 
 import xml_to_vm.ProgramStructure.Companion.getNextToken
 import xml_to_vm.ProgramStructure.Companion.checkNextToken
+import xml_to_vm.ProgramStructure.Companion.contentTokenTrim
 import xml_to_vm.ProgramStructure.Companion.throwNextToken
 
 class Expressions {
@@ -100,10 +101,6 @@ class Expressions {
                 "=" -> "eq"
                 else -> "error in op function"
             }
-        }
-
-        fun contentTokenTrim(str :String) : String {
-            return str.substring(str.indexOf("> ") + 2, str.indexOf(" </"))
         }
 
         fun keyWordConstantToVm(s : String) : String {
