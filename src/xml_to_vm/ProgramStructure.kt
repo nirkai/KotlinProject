@@ -20,7 +20,7 @@ class ProgramStructure {
 
 
             File(filePath).walk().forEach { fileJack ->
-                if (fileJack.isFile && fileJack.name.contains(".xml")) {
+                if (fileJack.isFile && !fileJack.name.contains("T.xml") && fileJack.name.contains(".xml")) {
                     inputFile = fileJack.readText()
                     var g = fileJack.readText()
 
