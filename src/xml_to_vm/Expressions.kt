@@ -68,7 +68,9 @@ class Expressions {
                             tempOutput = expression()
                             throwNextToken() // ]
                             tempOutput += "push ${typePopPush(type)} ${num}\n"
-                            tempOutput += "pop poiter 1\n"
+                            tempOutput += "add\n"
+                            tempOutput += "pop pointer 1\n"
+                            tempOutput += "push that 0\n"
                             output += tempOutput
                         } else {
                             output += "push ${typePopPush(type)} ${num}\n"
@@ -196,7 +198,7 @@ class Expressions {
                     }
                     else{ // varName
 
-                        output += "push ${typePopPush(kind)} 0\n"
+                        output += "push ${typePopPush(kind)} ${symbolTable.indexOf(name)}\n"
                         //throwNextToken() //<expressionList>
                         var (tmpOut,listArg) = expressionList()
                         throwNextToken() // )

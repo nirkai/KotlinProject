@@ -21,12 +21,14 @@ class Statements {
                 throwNextToken() // <statement>
                 output += statement()
             }*/
-            throwNextToken() // </statements>
+            if (checkNextToken().contains("</statements>"))
+                throwNextToken() // </statements>
             return output
         }
 
         fun statement(): String {
             var output: String = ""
+            var flag = true
             var s = checkNextToken()
             while (s.contains("letStatement|ifStatement|whileStatement|doStatement|returnStatement".toRegex())) {
                 throwNextToken() // <letStatement>|<ifStatement>|<whileStatement>|<doStatement>|<returnStatement>
@@ -40,9 +42,13 @@ class Statements {
                     s.contains("returnStatement") -> returnStatement()
                     else -> "error from function statement\n"
                 }
+
                 s = checkNextToken()
+
             }
+
                 throwNextToken() // </statement>
+
             return output
         }
 
@@ -95,6 +101,7 @@ class Statements {
             output += "goto WHILE_EXP${index}\n" +
                     "label WHILE_END${index}\n"
             //symbolTable.indextWhile++
+            throwNextToken() // </whileStatement>
             return output
         }
 
@@ -129,6 +136,7 @@ class Statements {
             else
                 output += "label IF_FALSE${index}\n"
             //symbolTable.indexIf++
+            throwNextToken() // </ifStatement>
             return output
         }
 
@@ -154,7 +162,8 @@ class Statements {
                 output += "pop temp 0\n" +
                         "pop pointer 1\n" +
                         "push temp 0\n" +
-                        "pop ${typePopPush(type)} ${numOfVar}\n"
+                        //"pop ${typePopPush(type)} ${numOfVar}\n"
+                        "pop that 0\n"
                 //throwNextToken() // ]
 
             }

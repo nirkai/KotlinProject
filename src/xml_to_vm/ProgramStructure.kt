@@ -174,6 +174,8 @@ class ProgramStructure {
 
             throwNextToken() // <statements>
             output += statements();
+            if (checkNextToken().contains("}"))
+                throwNextToken() // }
             throwNextToken() // </subroutineBody>
             return output
         }
