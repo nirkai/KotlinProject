@@ -1,6 +1,7 @@
 package jack_to_xml
 
 import parsing.ProgramStructure
+import xml_to_vm.ProgramStructure.Companion.symbolTable
 import java.nio.file.Files
 import java.nio.file.Paths
 

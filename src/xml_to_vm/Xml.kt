@@ -24,7 +24,7 @@ fun main(args: Array<String>) {
         }
     }
 
-
+    ProgramStructure.tokenizing(filePath);
 
 
 }
