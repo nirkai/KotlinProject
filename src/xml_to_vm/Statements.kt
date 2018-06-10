@@ -77,26 +77,30 @@ class Statements {
         }
 
         private fun whileStatement(): String {
+            var index = symbolTable.indexWhile
+            symbolTable.indexWhile++
             var output = ""
             throwNextToken() // while
             throwNextToken() // (
-            output += "label WHILE_EXP${symbolTable.indextWhile}\n"
+            output += "label WHILE_EXP${index}\n"
             throwNextToken() // <expression>
             output += expression()
             throwNextToken() // )
             output += "not\n" +
-                    "if-goto WHILE_END${symbolTable.indextWhile}\n"
+                    "if-goto WHILE_END${index}\n"
             throwNextToken() // {
             throwNextToken() // <statements>
             output += statements()
             throwNextToken() // }
-            output += "goto WHILE_EXP${symbolTable.indextWhile}\n" +
-                    "label WHILE_END${symbolTable.indextWhile} \n"
-            symbolTable.indextWhile++
+            output += "goto WHILE_EXP${index}\n" +
+                    "label WHILE_END${index}\n"
+            //symbolTable.indextWhile++
             return output
         }
 
         private fun ifStatement(): String {
+            var index = symbolTable.indexIf
+            symbolTable.indexIf++
             var output =""
             throwNextToken() // if
             throwNextToken() // (
@@ -104,27 +108,27 @@ class Statements {
             output += expression()
             throwNextToken() // )
 
-            output += "if-goto IF_TRUE${symbolTable.indexIf}\n"
-            output += "goto IF_FALSE${symbolTable.indexIf}\n"
-            output += "label IF_TRUE${symbolTable.indexIf}\n"
+            output += "if-goto IF_TRUE${index}\n"
+            output += "goto IF_FALSE${index}\n"
+            output += "label IF_TRUE${index}\n"
             throwNextToken() // {
             throwNextToken() // <statments>
             output += statements()
             throwNextToken() //}
 
             if (checkNextToken().contains("else")){
-                output += "goto IF_END${symbolTable.indexIf}\n" +
-                        "label IF_FALSE${symbolTable.indexIf}\n"
+                output += "goto IF_END${index}\n" +
+                        "label IF_FALSE${index}\n"
                 throwNextToken() // else
                 throwNextToken() // {
                 throwNextToken() // <statements>
                 output += statements()
                 throwNextToken() // }
-                output += "label IF_END${symbolTable.indexIf}\n"
+                output += "label IF_END${index}\n"
             }
             else
-                output += "label IF_FALSE${symbolTable.indexIf}\n"
-            symbolTable.indexIf++
+                output += "label IF_FALSE${index}\n"
+            //symbolTable.indexIf++
             return output
         }
 
@@ -136,11 +140,13 @@ class Statements {
             val type =  symbolTable.kindOf(name)
             val numOfVar = symbolTable.indexOf(name)
             if (contentTokenTrim(checkNextToken()).equals("[")) { // if let a[]  = kuku -- array
+                throwNextToken() // [
                 throwNextToken() // <expression>
                 output += expression()
-                throwNextToken() // [
-
-                output += "pop ${typePopPush(type)} ${numOfVar}\n"
+                //throwNextToken() // [
+                throwNextToken() // ]
+                output += "push ${typePopPush(type)} ${numOfVar}\n" +
+                        "add\n"
 
                 throwNextToken() // =
                 throwNextToken() // <expression>
@@ -149,7 +155,7 @@ class Statements {
                         "pop pointer 1\n" +
                         "push temp 0\n" +
                         "pop ${typePopPush(type)} ${numOfVar}\n"
-                throwNextToken() // ]
+                //throwNextToken() // ]
 
             }
 

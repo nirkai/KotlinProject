@@ -131,14 +131,16 @@ class Expressions {
         fun subroutineNameCallFunctionOutsideClass() : String {
             return ""
         }*/
-
-        fun expressionList() : String {
-            expressionListArgument = 0
+        data class Result(val output:String , var listArgument:Int)
+        fun expressionList() : Result {
+            //expressionListArgument = 0
+            var listArg:Int = 0
             var output = ""
             if (!checkNextToken().contains("</expressionList>")) {
 
                 do {
-                    expressionListArgument = expressionListArgument + 1
+                    //expressionListArgument = expressionListArgument + 1
+                    listArg++
                     if (checkNextToken().contains(","))
                         throwNextToken() // ,
                     throwNextToken() // <expression>
@@ -147,7 +149,8 @@ class Expressions {
             }
             //throwNextToken() // )
             throwNextToken() // </exprationList>
-            return output
+
+            return Result(output,listArg)
         }
 
         fun arrayTemp() : String {
@@ -165,9 +168,10 @@ class Expressions {
                    var nameFunction = contentTokenTrim(getNextToken())
                     throwNextToken() // (
                     throwNextToken() //<expressionList>
-                    var tmpOutPut = expressionList()
+                    var (tmpOutPut,listArg) = expressionList()
                     throwNextToken() // )
-                    var num = expressionListArgument + 1
+                    //var num = expressionListArgument + 1
+                    var num = listArg + 1
                     output += tmpOutPut
 
                     output += "call ${symbolTable.getClassName()}.${nameFunction} ${num}\n"
@@ -185,18 +189,20 @@ class Expressions {
                     var num:Int
                     if (symbolTable.typeOf(name).equals("")){ // ClassName
                         //throwNextToken() // <expressionList>
-                        tmpOutPut = expressionList()
+                        var (tmpOut, listArg) = expressionList()
                         throwNextToken() // )
-                        num = expressionListArgument
-
+                        num = listArg
+                        tmpOutPut += tmpOut
                     }
                     else{ // varName
 
                         output += "push ${typePopPush(kind)} 0\n"
                         //throwNextToken() //<expressionList>
-                        tmpOutPut = expressionList()
+                        var (tmpOut,listArg) = expressionList()
                         throwNextToken() // )
-                        num = expressionListArgument + 1
+                        //num = expressionListArgument + 1
+                        num = listArg + 1
+                        tmpOutPut += tmpOut
                     }
                     output += tmpOutPut
                     var type = symbolTable.typeOf(name)
@@ -247,7 +253,7 @@ class Expressions {
         fun stringConstant(str: String):String{
             val s = contentTokenTrim(str)
             var output = "push constant ${s.length}\n" +
-                    "call String new\n"
+                    "call String.new 1\n"
             var temp : Int
             for (i in s){
                 temp = i.toInt()

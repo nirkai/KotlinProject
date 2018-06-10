@@ -10,7 +10,7 @@ class SymbolTable {
     var varNum = 0
     var nameOfClass : String = ""
     var indexIf:Int = 0
-    var indextWhile:Int = 0
+    var indexWhile:Int = 0
 
     constructor(className : String){
         nameOfClass = className
@@ -20,7 +20,7 @@ class SymbolTable {
         argNum = 0
         varNum = 0
         indexIf = 0
-        indextWhile = 0
+        indexWhile = 0
     }
 
     public fun getClassName() : String{
@@ -32,7 +32,7 @@ class SymbolTable {
         argNum = 0
         varNum = 0
         indexIf = 0
-        indextWhile = 0
+        indexWhile = 0
     }
 
     public fun defineClassMap(name: String, type : String, kind : Kind) {
