@@ -21,6 +21,6 @@ fun main(args: Array<String>) {
         }
     }
 
-    Tokenizing2.tokenizing(filePath)
+    Tokenizing.tokenizing(filePath)
     ProgramStructure.tokenizing(filePath)
 }
