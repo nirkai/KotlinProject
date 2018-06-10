@@ -4,7 +4,6 @@ import xml_to_vm.ProgramStructure.Companion.checkFollow1Token
 import xml_to_vm.ProgramStructure.Companion.getNextToken
 import xml_to_vm.ProgramStructure.Companion.checkNextToken
 import xml_to_vm.ProgramStructure.Companion.contentTokenTrim
-import xml_to_vm.ProgramStructure.Companion.expressionListArgument
 import xml_to_vm.ProgramStructure.Companion.symbolTable
 import xml_to_vm.ProgramStructure.Companion.throwNextToken
 import xml_to_vm.ProgramStructure.Companion.typePopPush
@@ -81,67 +80,22 @@ class Expressions {
                 else -> {
                     throwNextToken() // <subroutineCall>
                     output += subroutineCall()
-                    /*var temp = getNextToken()
-                    when {
-                        temp.contains("[") -> varNameArray()
-                        temp.contains("\\(|\\.".toRegex()) -> {
-                            throwNextToken()  // <subroutineCall>
-                            subroutineCall(s)
-                        }
-                        else -> {
-                            "push ${findVarName()}\n"
-                        }
-                    }*/
+
                 }
             }
-            /*
-            var s = getNextToken()
-            var output = when {
-                s.contains("integerConstant") -> "push constant ${contentTokenTrim(s)}"
-                (s) -> keyWordConstantToVm(s)
-                s.contains("stringConstant") -> stringConstant(s)
-                s.contains("(") -> throwNextToken() + // <expression>
-                        expression() +
-                        throwNextToken()            // )
-                s.contains("-|~".toRegex()) -> {
-                    var unary = contentTokenTrim(s)
-                    throwNextToken()        // <term>
-                    term() + unaryVM(unary)
-                }
-                s.contains("identifier") -> {
-                    var temp = getNextToken()
-                    when {
-                        temp.contains("[") -> varNameArray()
-                        temp.contains("\\(|\\.".toRegex()) ->  throwNextToken() +   // <subroutineCall>
-                                subroutineCall(s)
-                        else -> {
-                            "push ${findVarName()}\n"
-                        }
-                    }
-                }
-                else -> "error in term"
-            }
-            */
+
             throwNextToken()        // </term>
             return output
         }
 
-        /*fun subroutineNameCallFunction(): String {
-            return ""
-        }
 
-        fun subroutineNameCallFunctionOutsideClass() : String {
-            return ""
-        }*/
         data class Result(val output:String , var listArgument:Int)
         fun expressionList() : Result {
-            //expressionListArgument = 0
             var listArg:Int = 0
             var output = ""
             if (!checkNextToken().contains("</expressionList>")) {
 
                 do {
-                    //expressionListArgument = expressionListArgument + 1
                     listArg++
                     if (checkNextToken().contains(","))
                         throwNextToken() // ,
@@ -149,17 +103,10 @@ class Expressions {
                     output += expression()
                 } while (checkNextToken().contains(","))
             }
-            //throwNextToken() // )
             throwNextToken() // </exprationList>
 
             return Result(output,listArg)
         }
-
-        fun arrayTemp() : String {
-            return ""
-        }
-
-
 
         fun subroutineCall() : String {
             var output = ""
@@ -199,10 +146,8 @@ class Expressions {
                     else{ // varName
 
                         output += "push ${typePopPush(kind)} ${symbolTable.indexOf(name)}\n"
-                        //throwNextToken() //<expressionList>
                         var (tmpOut,listArg) = expressionList()
                         throwNextToken() // )
-                        //num = expressionListArgument + 1
                         num = listArg + 1
                         tmpOutPut += tmpOut
                     }

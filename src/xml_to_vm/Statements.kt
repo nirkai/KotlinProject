@@ -1,13 +1,10 @@
 package xml_to_vm
 
-import xml_to_vm.Expressions.Companion.arrayTemp
 import xml_to_vm.ProgramStructure.Companion.getNextToken
 import xml_to_vm.ProgramStructure.Companion.checkNextToken
 import xml_to_vm.ProgramStructure.Companion.contentTokenTrim
 import xml_to_vm.ProgramStructure.Companion.throwNextToken
-import xml_to_vm.ProgramStructure.*
 import xml_to_vm.ProgramStructure.Companion.symbolTable
-import xml_to_vm.SymbolTable
 import xml_to_vm.Expressions.Companion.expression
 import xml_to_vm.Expressions.Companion.subroutineCall
 import xml_to_vm.ProgramStructure.Companion.typePopPush
@@ -17,10 +14,6 @@ class Statements {
         fun statements(): String {
             var output: String = ""
             output += statement()
-            /*if (checkNextToken().contains("statement")) {
-                throwNextToken() // <statement>
-                output += statement()
-            }*/
             if (checkNextToken().contains("</statements>"))
                 throwNextToken() // </statements>
             return output
@@ -42,13 +35,9 @@ class Statements {
                     s.contains("returnStatement") -> returnStatement()
                     else -> "error from function statement\n"
                 }
-
                 s = checkNextToken()
-
             }
-
                 throwNextToken() // </statement>
-
             return output
         }
 
@@ -100,7 +89,6 @@ class Statements {
             throwNextToken() // }
             output += "goto WHILE_EXP${index}\n" +
                     "label WHILE_END${index}\n"
-            //symbolTable.indextWhile++
             throwNextToken() // </whileStatement>
             return output
         }
@@ -114,7 +102,6 @@ class Statements {
             throwNextToken() // expression
             output += expression()
             throwNextToken() // )
-
             output += "if-goto IF_TRUE${index}\n"
             output += "goto IF_FALSE${index}\n"
             output += "label IF_TRUE${index}\n"
@@ -135,14 +122,12 @@ class Statements {
             }
             else
                 output += "label IF_FALSE${index}\n"
-            //symbolTable.indexIf++
             throwNextToken() // </ifStatement>
             return output
         }
 
         private fun letStatement(): String {
             var output = ""
-
             throwNextToken() // let
             val name = contentTokenTrim(getNextToken())
             val type =  symbolTable.kindOf(name)
@@ -151,21 +136,16 @@ class Statements {
                 throwNextToken() // [
                 throwNextToken() // <expression>
                 output += expression()
-                //throwNextToken() // [
                 throwNextToken() // ]
                 output += "push ${typePopPush(type)} ${numOfVar}\n" +
                         "add\n"
-
                 throwNextToken() // =
                 throwNextToken() // <expression>
                 output += expression()
                 output += "pop temp 0\n" +
                         "pop pointer 1\n" +
                         "push temp 0\n" +
-                        //"pop ${typePopPush(type)} ${numOfVar}\n"
                         "pop that 0\n"
-                //throwNextToken() // ]
-
             }
 
             else{ // if let a = kuku -- not array
@@ -175,7 +155,6 @@ class Statements {
                 output +="pop ${typePopPush(type)} ${numOfVar}\n"
 
             }
-
             throwNextToken() // ;
             throwNextToken() // </letStatement>
             return output

@@ -1,20 +1,13 @@
 package xml_to_vm
-
 import xml_to_vm.Statements.Companion.statements
 import java.io.File
 import java.io.FileWriter
-import kotlin.reflect.jvm.internal.impl.load.kotlin.JvmType
 
 class ProgramStructure {
     companion object {
         var symbolTable = SymbolTable("")
         var classNAme = ""
-
         @JvmStatic var inputFile = ""
-
-        var expressionListArgument:Int = 0
-
-
 
         fun tokenizing(filePath : String) {
 
@@ -53,7 +46,6 @@ class ProgramStructure {
         }
 
         private fun classVarDec() {
-            //symbolTable = SymbolTable(classNAme)
             var argKind = kind(contentTokenTrim(getNextToken()))
             var type = contentTokenTrim(getNextToken())
             var name : String
@@ -71,7 +63,6 @@ class ProgramStructure {
             symbolTable.startSubroutine()
             var token = checkNextToken()
             var output = ""
-            var num : Int = 0
             when {
                 token.contains("constructor") -> {
 
@@ -95,9 +86,7 @@ class ProgramStructure {
                             "push constant ${symbolTable.varCount(Kind.FIELD)}\n" +
                             "call Memory.alloc 1\n" +
                             "pop pointer 0\n" +
-                            tempOutput/* +
-                            "push pointer 0\n" +
-                            "return\n"*/
+                            tempOutput
 
 
 
@@ -128,7 +117,6 @@ class ProgramStructure {
                     throwNextToken()    // <parameterList>
                     symbolTable.defineFunctionMap("this", symbolTable.nameOfClass,Kind.ARG)
                     if (!checkNextToken().contains("</parameterList>")) {
-                        //throwNextToken() // <parameterList>
                         parameterList()
                     }
                     else
@@ -149,18 +137,14 @@ class ProgramStructure {
         }
 
         fun parameterList() {
-            //var count = num
-
-            do {
+           do {
                 if (checkNextToken().contains(","))
                     throwNextToken() // ,
                 var type = contentTokenTrim(getNextToken())
                 var name = contentTokenTrim(getNextToken())
                 symbolTable.defineFunctionMap(name, type, Kind.ARG)
-                //count++
             } while (checkNextToken().contains(","))
             throwNextToken() // </parameterList>
-
         }
         private fun subroutineBody(): String {
             var output = ""
@@ -208,7 +192,6 @@ class ProgramStructure {
 
         fun throwNextToken() {
             getNextToken()
-            //return ""
         }
 
         fun checkNextToken() : String {
