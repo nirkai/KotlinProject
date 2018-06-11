@@ -7,13 +7,7 @@ import java.io.IOException
 class Tokenizing {
     companion object {
         fun tokenizing(filePath : String) {
-            //var str = "father went /* blabla */ to work"
-            //str = str.replace("/\\*.*?\\*/".toRegex(), "")
-            //str = str.replaceRange(str.indexOf("//")..str.indexOf("\n"), "")
-            //println(str)
 
-            //var filePath = System.getProperty("user.dir")
-            //filePath += "//test"
             File(filePath).walk().forEach { fileJack ->
                 if (fileJack.isFile && fileJack.name.contains(".jack")) {
                     var outStream = FileWriter(filePath + "\\" + fileJack.name.removeSuffix(".jack") + "T.xml")
@@ -33,7 +27,7 @@ class Tokenizing {
             content = content.replace("//.*?\r?\n".toRegex(), "\n")
             content = content.replace("/\\*(?s).*?\\*/".toRegex(), "\n")
             content = content.replace("\r?\n".toRegex()," ")
-            content = content.replace("  *".toRegex(), " ")
+            //content = content.replace("  *".toRegex(), " ")
             println(content)
 
             fun number(index : Int) : Int{
