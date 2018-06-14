@@ -90,7 +90,7 @@ class Expressions {
 
 
         data class Result(val output:String , var listArgument:Int)
-        fun expressionList() : Result {
+        fun expressionList() : Pair<String, Int> {
             var listArg:Int = 0
             var output = ""
             if (!checkNextToken().contains("</expressionList>")) {
@@ -105,7 +105,7 @@ class Expressions {
             }
             throwNextToken() // </exprationList>
 
-            return Result(output,listArg)
+            return Pair(output,listArg)
         }
 
         fun subroutineCall() : String {
